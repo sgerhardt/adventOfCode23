@@ -111,8 +111,6 @@ func findGearRatios(s [][]rune) []int {
 				// current number sequence has ended
 				ns.anchorCell = cell{rowIndex, colIndex - 1}
 				if ns.hasPartNumber && ns.gearNumber != 0 {
-					//num, _ := strconv.Atoi(ns.number)
-					//foundPartNumbers = append(foundPartNumbers, num)
 					num, _ := strconv.Atoi(ns.number)
 					gearRatio := num * ns.gearNumber
 
@@ -134,13 +132,18 @@ func findGearRatios(s [][]rune) []int {
 				continue
 			}
 			ns.number += string(c)
-			if g := getConnectedGearCell(cell{rowIndex, colIndex}); g != nil {
+			if g := getConnectedGearCell(cell{rowIndex, colIndex}, nil); g != nil {
 				// add the digit's number sequence to the list of numbers
 				ns.hasPartNumber = true
 				var anchor int
 				ns.gearNumber, anchor = g.completeNumberSequence()
 				ns.connectedGearCellAnchor = &cell{g.x, anchor}
 				ns.connectedGearCell = g
+
+				//anotherConnectedCell := getConnectedGearCell(*g, &cell{rowIndex, colIndex})
+				//if anotherConnectedCell != nil {
+				//	ns.reset()
+				//}
 			}
 			// if at end of row, and we have a number sequence that has a gear, add it to the list of gear ratios
 			if colIndex == len(row)-1 && ns.hasPartNumber && ns.gearNumber != 0 {
@@ -187,6 +190,8 @@ func (c *cell) completeNumberSequence() (int, int) {
 			// add digit to number sequence
 			sequence += string(schematic[c.x][y])
 			maxY = y
+		} else {
+			break
 		}
 	}
 
@@ -201,10 +206,15 @@ func (c *cell) completeNumberSequence() (int, int) {
 	return n, maxY
 }
 
-func getConnectedGearCell(c cell) *cell {
+func getConnectedGearCell(c cell, previouslyConnectedCell *cell) *cell {
 	// a part number is a gear if it has a neighbor that is a "*" in any direction,
 	// and that "*" has another neighbor that is a digit
+	//connectedCount := 0
 	for _, neighbor := range neighbors(c) {
+		//if previouslyConnectedCell != nil && neighbor.x == previouslyConnectedCell.x && neighbor.y == previouslyConnectedCell.y {
+		//connectedCount++
+		//continue
+		//}
 		if schematic[neighbor.x][neighbor.y] == '*' {
 			// see if any neighbors of the "*" are digits, excluding the current cell
 			for _, neighborOfStar := range neighbors(neighbor) {
@@ -213,6 +223,9 @@ func getConnectedGearCell(c cell) *cell {
 				}
 				_, err := strconv.Atoi(string(schematic[neighborOfStar.x][neighborOfStar.y]))
 				if err == nil {
+					//if connectedCount > 1 {
+					//	return nil
+					//}
 					return &neighborOfStar
 				}
 			}
