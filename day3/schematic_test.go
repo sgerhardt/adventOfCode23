@@ -61,9 +61,9 @@ func Test_findGearRatios(t *testing.T) {
 			{'.', '.', '.', '*', '.', '.', '.', '.', '.', '.'},
 			{'.', '.', '3', '5', '.', '.', '6', '3', '3', '.'},
 		}}, want: []int{16345}},
-		{name: "multi digit gear ratio - example 2", args: args{[][]rune{
-			{'.', '.', '.', '2', '3', '.', '.'},
-			{'9', '0', '*', '1', '2', '.', '.'},
+		{name: "too many numbers for a gear", args: args{[][]rune{
+			{'3', '.', '.'},
+			{'4', '*', '1'},
 		}}, want: nil},
 	}
 	for _, tt := range tests {

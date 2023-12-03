@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -132,7 +133,7 @@ func findGearRatios(s [][]rune) []int {
 				continue
 			}
 			ns.number += string(c)
-			if g := getConnectedGearCell(cell{rowIndex, colIndex}, nil); g != nil {
+			if g, _ := getConnectedGearCell(cell{rowIndex, colIndex}, nil); g != nil {
 				// add the digit's number sequence to the list of numbers
 				ns.hasPartNumber = true
 				var anchor int
@@ -140,10 +141,11 @@ func findGearRatios(s [][]rune) []int {
 				ns.connectedGearCellAnchor = &cell{g.x, anchor}
 				ns.connectedGearCell = g
 
-				//anotherConnectedCell := getConnectedGearCell(*g, &cell{rowIndex, colIndex})
-				//if anotherConnectedCell != nil {
-				//	ns.reset()
-				//}
+				_, anotherConnectedCellErr := getConnectedGearCell(*ns.connectedGearCellAnchor, &cell{rowIndex, colIndex})
+				if anotherConnectedCellErr != nil {
+					ns.reset()
+					continue
+				}
 			}
 			// if at end of row, and we have a number sequence that has a gear, add it to the list of gear ratios
 			if colIndex == len(row)-1 && ns.hasPartNumber && ns.gearNumber != 0 {
@@ -155,6 +157,11 @@ func findGearRatios(s [][]rune) []int {
 				var connectedCell bool
 				if ns.connectedGearCell != nil {
 					_, connectedCell = previouslyCalculatedCells[cell{ns.connectedGearCellAnchor.x, ns.connectedGearCellAnchor.y}]
+				}
+				_, anotherConnectedCellErr := getConnectedGearCell(*ns.connectedGearCellAnchor, &cell{rowIndex, colIndex})
+				if anotherConnectedCellErr != nil {
+					ns.reset()
+					continue
 				}
 				if !originalCell && !connectedCell {
 					gearRatios = append(gearRatios, gearRatio)
@@ -206,15 +213,16 @@ func (c *cell) completeNumberSequence() (int, int) {
 	return n, maxY
 }
 
-func getConnectedGearCell(c cell, previouslyConnectedCell *cell) *cell {
+func getConnectedGearCell(c cell, previouslyConnectedCell *cell) (*cell, error) {
 	// a part number is a gear if it has a neighbor that is a "*" in any direction,
 	// and that "*" has another neighbor that is a digit
-	//connectedCount := 0
+	connectedCount := 0
+	var connectedCell *cell
 	for _, neighbor := range neighbors(c) {
-		//if previouslyConnectedCell != nil && neighbor.x == previouslyConnectedCell.x && neighbor.y == previouslyConnectedCell.y {
-		//connectedCount++
-		//continue
-		//}
+		if previouslyConnectedCell != nil && neighbor.x == previouslyConnectedCell.x && neighbor.y == previouslyConnectedCell.y {
+			connectedCount++
+			continue
+		}
 		if schematic[neighbor.x][neighbor.y] == '*' {
 			// see if any neighbors of the "*" are digits, excluding the current cell
 			for _, neighborOfStar := range neighbors(neighbor) {
@@ -223,15 +231,27 @@ func getConnectedGearCell(c cell, previouslyConnectedCell *cell) *cell {
 				}
 				_, err := strconv.Atoi(string(schematic[neighborOfStar.x][neighborOfStar.y]))
 				if err == nil {
-					//if connectedCount > 1 {
-					//	return nil
-					//}
-					return &neighborOfStar
+					if connectedCount == 1 {
+						// we are already connected so this isn't a gear!
+						return nil, errors.New("already visited cell")
+					}
+					connectedCount++
+					connectedCell = &cell{
+						x: neighborOfStar.x,
+						y: neighborOfStar.y,
+					}
+
+					// TODO fix this
+					return &neighborOfStar, nil
 				}
 			}
 		}
 	}
-	return nil
+	if connectedCount > 1 {
+		// we are already connected so this isn't a gear!
+		return nil, errors.New("already visited cell")
+	}
+	return connectedCell, nil
 }
 
 func isPartNumber(c cell) bool {
