@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Hardcoded filename
-	filename := "day3/test.txt"
+	filename := "day3/schematic.txt"
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -34,13 +34,15 @@ func main() {
 	//fmt.Printf("Part numbers: %v\n", partNumbers)
 	fmt.Printf("Part numbers sum: %v\n", sum)
 
-	gearRatios := findGearRatios(schematic)
+	findGears(schematic)
 
-	gearRatioSum := 0
-	for _, ratio := range gearRatios {
-		gearRatioSum += ratio
-	}
-	fmt.Printf("Gear ratios sum: %v\n", gearRatioSum)
+	//gearRatios := findGearRatios(schematic)
+	//
+	//gearRatioSum := 0
+	//for _, ratio := range gearRatios {
+	//	gearRatioSum += ratio
+	//}
+	//fmt.Printf("Gear ratios sum: %v\n", gearRatioSum)
 
 }
 
@@ -100,91 +102,16 @@ func findPartNumbers(s [][]rune) []int {
 	return foundPartNumbers
 }
 
-func findGearRatios(s [][]rune) []int {
-	previouslyCalculatedCells := map[cell]struct{}{}
-	schematic = s
-	var gearRatios []int
-	for rowIndex, row := range s {
-		ns := numberSequence{}
-		for colIndex, c := range row {
-			_, err := strconv.Atoi(string(c))
-			if err != nil {
-				// current number sequence has ended
-				ns.anchorCell = cell{rowIndex, colIndex - 1}
-				if ns.hasPartNumber && ns.gearNumber != 0 {
-					num, _ := strconv.Atoi(ns.number)
-					gearRatio := num * ns.gearNumber
-
-					// if cells aren't already calculated, add it to the list of gear ratios
-					var calcedConnectedCell bool
-					if ns.connectedGearCellAnchor != nil {
-						_, calcedConnectedCell = previouslyCalculatedCells[cell{ns.connectedGearCellAnchor.x, ns.connectedGearCellAnchor.y}]
-					}
-					_, calcedOriginalCell := previouslyCalculatedCells[ns.anchorCell]
-					if !calcedConnectedCell && !calcedOriginalCell {
-						gearRatios = append(gearRatios, gearRatio)
-					}
-					if ns.connectedGearCellAnchor != nil {
-						previouslyCalculatedCells[cell{ns.connectedGearCellAnchor.x, ns.connectedGearCellAnchor.y}] = struct{}{}
-					}
-					previouslyCalculatedCells[ns.anchorCell] = struct{}{}
-				}
-				ns.reset()
-				continue
-			}
-			ns.number += string(c)
-			if g, _ := getConnectedGearCell(cell{rowIndex, colIndex}, nil); g != nil {
-				// add the digit's number sequence to the list of numbers
-				ns.hasPartNumber = true
-				var anchor int
-				ns.gearNumber, anchor = g.completeNumberSequence()
-				ns.connectedGearCellAnchor = &cell{g.x, anchor}
-				ns.connectedGearCell = g
-
-				_, anotherConnectedCellErr := getConnectedGearCell(*ns.connectedGearCellAnchor, &cell{rowIndex, colIndex})
-				if anotherConnectedCellErr != nil {
-					ns.reset()
-					continue
-				}
-			}
-			// if at end of row, and we have a number sequence that has a gear, add it to the list of gear ratios
-			if colIndex == len(row)-1 && ns.hasPartNumber && ns.gearNumber != 0 {
-				ns.anchorCell = cell{rowIndex, colIndex}
-				num, _ := strconv.Atoi(ns.number)
-				gearRatio := num * ns.gearNumber
-				// if cells aren't already calculated, add it to the list of gear ratios
-				_, originalCell := previouslyCalculatedCells[cell{rowIndex, colIndex}]
-				var connectedCell bool
-				if ns.connectedGearCell != nil {
-					_, connectedCell = previouslyCalculatedCells[cell{ns.connectedGearCellAnchor.x, ns.connectedGearCellAnchor.y}]
-				}
-				_, anotherConnectedCellErr := getConnectedGearCell(*ns.connectedGearCellAnchor, &cell{rowIndex, colIndex})
-				if anotherConnectedCellErr != nil {
-					ns.reset()
-					continue
-				}
-				if !originalCell && !connectedCell {
-					gearRatios = append(gearRatios, gearRatio)
-				}
-				// add cell to map of visited cells
-				previouslyCalculatedCells[cell{rowIndex, colIndex}] = struct{}{}
-				if ns.connectedGearCell != nil {
-					previouslyCalculatedCells[cell{ns.connectedGearCellAnchor.x, ns.connectedGearCellAnchor.y}] = struct{}{}
-				}
-			}
-		}
-	}
-	return gearRatios
-}
-
-func (c *cell) completeNumberSequence() (int, int) {
+func (c *cell) completeNumberSequence() (int, int, int) {
 	base := schematic[c.x][c.y]
 	sequence := string(base)
+	minY := c.y
 	// prefix number sequence with digits from the left until we hit a non-digit or out of bounds
 	for y := c.y - 1; y >= 0; y-- {
 		if schematic[c.x][y] >= '0' && schematic[c.x][y] <= '9' {
 			// add digit to number sequence
 			sequence = string(schematic[c.x][y]) + sequence
+			minY = y
 		} else {
 			break
 		}
@@ -210,7 +137,7 @@ func (c *cell) completeNumberSequence() (int, int) {
 	if err != nil {
 		n = 0
 	}
-	return n, maxY
+	return n, minY, maxY
 }
 
 func getConnectedGearCell(c cell, previouslyConnectedCell *cell) (*cell, error) {
