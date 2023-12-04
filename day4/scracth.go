@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// Hardcoded filename
-	filename := "day4/test.txt"
+	filename := "day4/scratch.txt"
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -76,13 +76,10 @@ func calcWinnings(winningNumbers, cardNumbers map[string]struct{}) int {
 }
 
 func part2(file *os.File) {
-
-	cardCounts := map[string]int{}
 	scanner := bufio.NewScanner(file)
-	totalScratchCards := 0
 	gameNum := 0
 
-	scratchcardSet := map[*scratchcard]struct{}{}
+	var scratchcards []scratchcard
 	for scanner.Scan() {
 		gameNum++
 		line := scanner.Text()
@@ -110,19 +107,13 @@ func part2(file *os.File) {
 			c := strings.TrimSpace(cardNumber)
 			cardSet[c] = struct{}{}
 		}
-		scratchcardSet[&scratchcard{gameNumber: gameNum, winningNumbers: winnerSet, cardNumbers: cardSet}] = struct{}{}
+		scratchcards = append(scratchcards, scratchcard{
+			winningNumbers: winnerSet,
+			cardNumbers:    cardSet,
+			gameNumber:     gameNum,
+		})
 	}
-
-	for s := range scratchcardSet {
-		wonCards := getScratchcardsForWin(*s)
-		for _, wonCard := range wonCards {
-			// we need to rerun the game for each card won
-			newCards := getScratchcardsForWin(wonCard)
-			cardCounts[strconv.Itoa(wonCard.gameNumber)]++
-			println(newCards)
-		}
-		totalScratchCards += len(wonCards)
-	}
+	totalScratchCards := processScratchcards(scratchcards)
 	println("Total Cards Processed " + ": " + strconv.Itoa(totalScratchCards))
 }
 
@@ -130,6 +121,38 @@ type scratchcard struct {
 	gameNumber     int
 	winningNumbers map[string]struct{}
 	cardNumbers    map[string]struct{}
+}
+
+func processScratchcards(scratchcards []scratchcard) int {
+	total := 0
+	processed := 0
+
+	for processed < len(scratchcards) {
+		card := scratchcards[processed]
+		matches := countMatches(card)
+		total++
+
+		for i := 1; i <= matches; i++ {
+			nextCardIndex := card.gameNumber - 1 + i
+			if nextCardIndex < len(scratchcards) {
+				scratchcards = append(scratchcards, scratchcards[nextCardIndex])
+			}
+		}
+
+		processed++
+	}
+
+	return total
+}
+
+func countMatches(card scratchcard) int {
+	matches := 0
+	for number := range card.cardNumbers {
+		if _, exists := card.winningNumbers[number]; exists {
+			matches++
+		}
+	}
+	return matches
 }
 
 // getScratchcardsForWin returns a list of scratchcards that are the reward for matching numbers on an existing card.
