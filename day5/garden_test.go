@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_findLowestLocationNumberForSeed(t *testing.T) {
 	seedToSoilMapping := []gardenMap{
@@ -128,8 +130,6 @@ func Test_findLowestLocationNumberForSeed(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
-		// simple test case
 		{name: "simple test case", args: args{
 			seed:                     79,
 			seedToSoilMapping:        seedToSoilMapping,
@@ -145,6 +145,64 @@ func Test_findLowestLocationNumberForSeed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := findLowestLocationNumberForSeed(tt.args.seed, tt.args.seedToSoilMapping, tt.args.soilToFertilizerMapping, tt.args.fertilizerToWaterMapping, tt.args.waterToLightMap, tt.args.lightToTemperatureMap, tt.args.temperatureToHumidityMap, tt.args.humidityToLocationMap); got != tt.want {
 				t.Errorf("findLowestLocationNumberForSeed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_mapNumber(t *testing.T) {
+	type args struct {
+		number int
+		maps   []gardenMap
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "simple",
+			args: args{
+				number: 99,
+				maps: []gardenMap{
+					{
+						destinationRangeStart: 50,
+						sourceRangeStart:      98,
+						rangeLength:           2,
+					},
+					{
+						destinationRangeStart: 52,
+						sourceRangeStart:      50,
+						rangeLength:           48,
+					},
+				},
+			},
+			want: 51,
+		},
+		{
+			name: "simple 2",
+			args: args{
+				number: 51,
+				maps: []gardenMap{
+					{
+						destinationRangeStart: 50,
+						sourceRangeStart:      98,
+						rangeLength:           2,
+					},
+					{
+						destinationRangeStart: 52,
+						sourceRangeStart:      50,
+						rangeLength:           48,
+					},
+				},
+			},
+			want: 53,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := mapNumber(tt.args.number, tt.args.maps); got != tt.want {
+				t.Errorf("mapNumber() = %v, want %v", got, tt.want)
 			}
 		})
 	}
