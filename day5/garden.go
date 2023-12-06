@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// Hardcoded filename
-	filename := "day5/garden.txt"
+	filename := "day5/test.txt"
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -62,7 +62,8 @@ func garden(file *os.File) {
 		}
 	}
 
-	part1(seeds, seedToSoilMapping, soilToFertilizerMapping, fertilizerToWaterMapping, waterToLightMap, lightToTemperatureMap, temperatureToHumidityMap, humidityToLocationMap)
+	//part1(seeds, seedToSoilMapping, soilToFertilizerMapping, fertilizerToWaterMapping, waterToLightMap, lightToTemperatureMap, temperatureToHumidityMap, humidityToLocationMap)
+	part2(seeds, seedToSoilMapping, soilToFertilizerMapping, fertilizerToWaterMapping, waterToLightMap, lightToTemperatureMap, temperatureToHumidityMap, humidityToLocationMap)
 }
 
 func part1(seeds []int, seedToSoilMapping []gardenMap, soilToFertilizerMapping []gardenMap, fertilizerToWaterMapping []gardenMap, waterToLightMap []gardenMap, lightToTemperatureMap []gardenMap, temperatureToHumidityMap []gardenMap, humidityToLocationMap []gardenMap) {
@@ -86,26 +87,47 @@ func part1(seeds []int, seedToSoilMapping []gardenMap, soilToFertilizerMapping [
 	fmt.Printf("lowest is seed: %d", lowest)
 }
 
-//func part2(seeds []int, seedToSoilMapping []gardenMap, soilToFertilizerMapping []gardenMap, fertilizerToWaterMapping []gardenMap, waterToLightMap []gardenMap, lightToTemperatureMap []gardenMap, temperatureToHumidityMap []gardenMap, humidityToLocationMap []gardenMap) {
-//	lowest := math.MaxInt64
-//	for _, seed := range seedRanges {
-//		loc := findLowestLocationNumberForSeedRange(
-//			seed,
-//			seedToSoilMapping,
-//			soilToFertilizerMapping,
-//			fertilizerToWaterMapping,
-//			waterToLightMap,
-//			lightToTemperatureMap,
-//			temperatureToHumidityMap,
-//			humidityToLocationMap,
-//		)
-//		if loc < lowest {
-//			lowest = loc
-//		}
-//		fmt.Printf("seed %d at location: %d\n", seed, loc)
-//	}
-//	fmt.Printf("lowest is seed: %d", lowest)
-//}
+type seedPair struct {
+	seedStart int
+	seedRange int
+}
+
+func pairSeeds(seeds []int) []seedPair {
+	var seedPairs []seedPair
+	for i := 0; i < len(seeds); i += 2 {
+		seedPairs = append(seedPairs, seedPair{
+			seedStart: seeds[i],
+			seedRange: seeds[i+1],
+		})
+	}
+	return seedPairs
+}
+
+func part2(seeds []int, seedToSoilMapping []gardenMap, soilToFertilizerMapping []gardenMap, fertilizerToWaterMapping []gardenMap, waterToLightMap []gardenMap, lightToTemperatureMap []gardenMap, temperatureToHumidityMap []gardenMap, humidityToLocationMap []gardenMap) {
+	lowest := math.MaxInt64
+	rangePairs := pairSeeds(seeds)
+	for _, rangePair := range rangePairs {
+		//start, length := rangePair, rangePair[1]
+		for i := 0; i < rangePair.seedRange; i++ {
+			seed := rangePair.seedStart + i
+			loc := findLowestLocationNumberForSeedRange(
+				seed,
+				seedToSoilMapping,
+				soilToFertilizerMapping,
+				fertilizerToWaterMapping,
+				waterToLightMap,
+				lightToTemperatureMap,
+				temperatureToHumidityMap,
+				humidityToLocationMap,
+			)
+			if loc < lowest {
+				lowest = loc
+			}
+			fmt.Printf("seed %d at location: %d\n", seed, loc)
+		}
+	}
+	fmt.Printf("lowest is seed: %d", lowest)
+}
 
 func findLowestLocationNumberForSeedRange(
 	seed int,
