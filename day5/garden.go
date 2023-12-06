@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// Hardcoded filename
-	filename := "day5/test.txt"
+	filename := "day5/garden.txt"
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -107,7 +107,6 @@ func part2(seeds []int, seedToSoilMapping []gardenMap, soilToFertilizerMapping [
 	lowest := math.MaxInt64
 	rangePairs := pairSeeds(seeds)
 	for _, rangePair := range rangePairs {
-		//start, length := rangePair, rangePair[1]
 		for i := 0; i < rangePair.seedRange; i++ {
 			seed := rangePair.seedStart + i
 			loc := findLowestLocationNumberForSeedRange(
@@ -123,7 +122,10 @@ func part2(seeds []int, seedToSoilMapping []gardenMap, soilToFertilizerMapping [
 			if loc < lowest {
 				lowest = loc
 			}
-			fmt.Printf("seed %d at location: %d\n", seed, loc)
+			// Check if the index is a multiple of 10
+			if (i+1)%10000000 == 0 {
+				fmt.Printf("seed %d at location: %d, lowest seed:%d\n", seed, loc, lowest)
+			}
 		}
 	}
 	fmt.Printf("lowest is seed: %d", lowest)
