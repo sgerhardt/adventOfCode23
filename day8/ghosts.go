@@ -7,15 +7,28 @@ import (
 	"strings"
 )
 
-func main() {
-	// Hardcoded filename
-	filename := "day8/nodes.txt"
-
-	//part1(filename)
-	part2(filename)
+// greatest common divisor (GCD) via Euclidean algorithm
+func GCD(a, b int) int {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
 }
 
-func part1(filename string) {
+// find Least Common Multiple (LCM) via GCD
+func LCM(a, b int, integers ...int) int {
+	result := a * b / GCD(a, b)
+
+	for i := 0; i < len(integers); i++ {
+		result = LCM(result, integers[i])
+	}
+
+	return result
+}
+
+func part2(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
@@ -76,34 +89,33 @@ func part1(filename string) {
 		//fmt.Println(n.name + ":" + n.leftNode.name + "," + n.rightNode.name)
 	}
 
-	findStepsRequired(instructions, nodes)
-
-}
-
-type node struct {
-	previouslyVisited       bool
-	prevVisitInstructionIdx int
-	name                    string
-	leftNode                *node
-	rightNode               *node
-}
-
-func findStepsRequired(instructions []rune, nodes []*node) int {
-	escaped := false
-	var currentNode *node
-	// only start when we find "AAA"
+	var nodesEndingInA []*node
 	for _, n := range nodes {
-		if n.name == "AAA" {
-			currentNode = n
+		if strings.HasSuffix(n.name, "A") {
+			nodesEndingInA = append(nodesEndingInA, n)
 		}
 	}
+
+	var stepsRequired []int
+	for _, n := range nodesEndingInA {
+		stepsRequired = append(stepsRequired, findStepsRequiredForGhost(instructions, n, nodes))
+	}
+	fmt.Println(stepsRequired)
+
+	fmt.Println(LCM(stepsRequired[0], stepsRequired[1], stepsRequired[2], stepsRequired[3], stepsRequired[4], stepsRequired[5]))
+}
+
+func findStepsRequiredForGhost(instructions []rune, startingNode *node, nodes []*node) int {
+	escaped := false
+	var currentNode *node
+	currentNode = startingNode
 
 	stepCount := 0
 	for !escaped {
 		// continue following instructions until we hit our target node of ZZZ
 		for idx := 0; idx < len(instructions); idx++ {
 
-			if currentNode.name == "ZZZ" {
+			if strings.HasSuffix(currentNode.name, "Z") {
 				escaped = true
 				break
 			}
@@ -112,13 +124,13 @@ func findStepsRequired(instructions []rune, nodes []*node) int {
 			currentNode.prevVisitInstructionIdx = idx
 
 			if instructions[idx] == 'L' {
-				if currentNode.leftNode.name == "ZZZ" {
+				if strings.HasSuffix(currentNode.leftNode.name, "Z") {
 					escaped = true
 					//break
 				}
 				currentNode = currentNode.leftNode
 			} else if instructions[idx] == 'R' {
-				if currentNode.rightNode.name == "ZZZ" {
+				if strings.HasSuffix(currentNode.rightNode.name, "Z") {
 					escaped = true
 					//break
 				}
@@ -127,9 +139,7 @@ func findStepsRequired(instructions []rune, nodes []*node) int {
 				panic("shouldn't be here")
 			}
 			stepCount++
-			//fmt.Println(fmt.Sprintf("%d", stepCount) + " steps")
 		}
-
 	}
 
 	fmt.Println("Completed in " + fmt.Sprintf("%d", stepCount) + " steps")
