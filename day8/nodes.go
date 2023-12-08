@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Hardcoded filename
-	filename := "day8/test.txt"
+	filename := "day8/nodes.txt"
 
 	part1(filename)
 	//part2(filename)
@@ -58,7 +58,7 @@ func part1(filename string) {
 				},
 			})
 		}
-		fmt.Println(line)
+		//fmt.Println(line)
 		lineCount++
 	}
 
@@ -73,7 +73,7 @@ func part1(filename string) {
 				n.rightNode = n2
 			}
 		}
-		fmt.Println(n.name + ":" + n.leftNode.name + "," + n.rightNode.name)
+		//fmt.Println(n.name + ":" + n.leftNode.name + "," + n.rightNode.name)
 	}
 
 	findStepsRequired(instructions, nodes)
@@ -81,11 +81,11 @@ func part1(filename string) {
 }
 
 type node struct {
-	previouslyVisited    bool
-	prevVisitInstruction rune
-	name                 string
-	leftNode             *node
-	rightNode            *node
+	previouslyVisited       bool
+	prevVisitInstructionIdx int
+	name                    string
+	leftNode                *node
+	rightNode               *node
 }
 
 func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
@@ -100,31 +100,15 @@ func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
 		for idx < len(instructions) {
 
 			//TODO handle skipping ahead
-			fmt.Println(currentNode.name+" visited:%+v", currentNode.previouslyVisited)
+			//fmt.Println(currentNode.name+" visited:%+v", currentNode.previouslyVisited)
 			if currentNode.name == "ZZZ" {
 				escaped = true
 				break
 			}
-			//if currentNode.previouslyVisited && currentNode.prevVisitInstruction == instructions[idx] {
-			//	// we've been here before... if we're following the same instructions, we can skip ahead
-			//	fmt.Println("previously visited " + currentNode.name)
-			//	if instructionIterations >= 0 {
-			//		println(idx)
-			//		// calculate the steps we've taken in this iteration
-			//		stepsTakenInThisInstructionIteration := idx + 1
-			//		println(stepsTakenInThisInstructionIteration)
-			//		// skip ahead to as many steps as it took us to get here before
-			//		stepCount += stepsTakenInThisInstructionIteration
-			//		// skip to the right idx of the loop
-			//		remainder := stepCount % len(instructions)
-			//		idx = remainder
-			//		instructionIterations++
-			//	}
-			//	println(instructionIterations)
-			//}
+			//idx, instructionIterations, stepCount = skipAhead(instructions, currentNode, idx, instructionIterations, stepCount)
 
 			currentNode.previouslyVisited = true
-			currentNode.prevVisitInstruction = instructions[idx]
+			currentNode.prevVisitInstructionIdx = idx
 
 			if instructions[idx] == 'L' {
 				if currentNode.leftNode.name == "ZZZ" {
@@ -153,4 +137,29 @@ func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
 
 	fmt.Println("Completed in " + fmt.Sprintf("%d", stepCount) + " steps")
 	return stepCount, stepCount
+}
+
+func skipAhead(instructions []rune, currentNode *node, idx int, instructionIterations int, stepCount int) (int, int, int) {
+	if instructionIterations == 0 {
+		return idx, instructionIterations, stepCount
+	}
+
+	if currentNode.previouslyVisited && (currentNode.prevVisitInstructionIdx == idx) {
+		// we've been here before, and it's heading the same direction, so we skip ahead
+		fmt.Println("previously visited " + currentNode.name)
+
+		println(idx)
+		// calculate the steps we've taken in this iteration
+		stepsTakenInThisInstructionIteration := idx + 1
+		println(stepsTakenInThisInstructionIteration)
+		// skip ahead to as many steps as it took us to get here before
+		stepCount += stepsTakenInThisInstructionIteration
+		// skip to the right idx of the loop
+		remainder := stepCount % len(instructions)
+		idx = remainder
+		instructionIterations++
+
+		println(instructionIterations)
+	}
+	return idx, instructionIterations, stepCount
 }

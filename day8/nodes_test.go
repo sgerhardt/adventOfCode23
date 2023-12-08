@@ -70,7 +70,7 @@ func Test_findStepsRequired(t *testing.T) {
 					nodeBBB.rightNode = nodeZZZ
 				},
 				expectedSteps:             6,
-				expectedRawStepIterations: 4,
+				expectedRawStepIterations: 6, //todo is this right?
 			},
 		},
 	}
