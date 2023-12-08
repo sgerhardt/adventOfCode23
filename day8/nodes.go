@@ -96,11 +96,8 @@ func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
 	instructionIterations := 0
 	for !escaped {
 		// continue following instructions until we hit our target node of ZZZ
-		idx := 0
-		for idx < len(instructions) {
+		for idx := 0; idx < len(instructions); idx++ {
 
-			//TODO handle skipping ahead
-			//fmt.Println(currentNode.name+" visited:%+v", currentNode.previouslyVisited)
 			if currentNode.name == "ZZZ" {
 				escaped = true
 				break
@@ -124,15 +121,15 @@ func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
 					break
 				}
 				currentNode = currentNode.rightNode
-			}
-			if idx == len(instructions)-1 {
-				idx = 0
 			} else {
-				idx++
+				panic("shouldn't be here")
 			}
 			stepCount++
+			//fmt.Println(fmt.Sprintf("%d", stepCount) + " steps")
 		}
 		instructionIterations++
+		fmt.Println(fmt.Sprintf("%d", instructionIterations) + " instructionIterations")
+
 	}
 
 	fmt.Println("Completed in " + fmt.Sprintf("%d", stepCount) + " steps")

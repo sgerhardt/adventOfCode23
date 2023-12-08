@@ -18,6 +18,17 @@ var nodeCCC = &node{
 	name: "CCC",
 }
 
+var nodeDDD = &node{
+	name: "DDD",
+}
+
+var nodeEEE = &node{
+	name: "EEE",
+}
+var nodeGGG = &node{
+	name: "GGG",
+}
+
 var nodeZZZ = &node{
 	name: "ZZZ",
 }
@@ -43,11 +54,20 @@ func Test_findStepsRequired(t *testing.T) {
 					nodeAAA.leftNode = nodeBBB
 					nodeAAA.rightNode = nodeCCC
 
-					nodeBBB.leftNode = nodeBBB
-					nodeBBB.rightNode = nodeCCC
+					nodeBBB.leftNode = nodeDDD
+					nodeBBB.rightNode = nodeEEE
 
 					nodeCCC.leftNode = nodeZZZ
-					nodeCCC.rightNode = nodeBBB
+					nodeCCC.rightNode = nodeGGG
+
+					nodeDDD.leftNode = nodeDDD
+					nodeDDD.rightNode = nodeDDD
+
+					nodeEEE.leftNode = nodeEEE
+					nodeEEE.rightNode = nodeEEE
+
+					nodeGGG.leftNode = nodeGGG
+					nodeGGG.rightNode = nodeGGG
 
 					nodeZZZ.leftNode = nodeZZZ
 					nodeZZZ.rightNode = nodeZZZ
