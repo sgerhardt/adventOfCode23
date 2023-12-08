@@ -13,16 +13,17 @@ func main() {
 	// Hardcoded filename
 	filename := "day7/cards.txt"
 
+	part1(filename)
+	part2(filename)
+}
+
+func part1(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 		os.Exit(1)
 	}
 	defer file.Close()
-	part1(file)
-}
-
-func part1(file *os.File) {
 	scanner := bufio.NewScanner(file)
 
 	var hands []hand
@@ -38,9 +39,7 @@ func part1(file *os.File) {
 		}
 		hands = append(hands, h)
 	}
-
 	fmt.Println(calculateWinnings(orderHands(hands)))
-
 }
 
 func parseHand(s string) [5]int {
@@ -79,21 +78,21 @@ func parseHand(s string) [5]int {
 	return cards
 }
 
-const (
-	// A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, or 2
-	two int = iota
-	three
-	four
-	five
-	six
-	seven
-	eight
-	nine
-	ten
-	jack
-	queen
-	king
-	ace
+var (
+	// these are vars as J can change value ordering in part 2
+	two   = 0
+	three = 1
+	four  = 2
+	five  = 3
+	six   = 4
+	seven = 5
+	eight = 6
+	nine  = 7
+	ten   = 8
+	jack  = 9
+	queen = 10
+	king  = 11
+	ace   = 12
 )
 
 const (
@@ -119,7 +118,6 @@ func (h *hand) calcStrength() int {
 
 	hasThreeOfAKind, hasOnePair := false, false
 	for _, occurrences := range cardToOccurrence {
-		//8 8 8 7 6
 		if occurrences == 5 {
 			return fiveOfAKind
 		}
