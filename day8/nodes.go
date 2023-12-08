@@ -90,8 +90,14 @@ type node struct {
 
 func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
 	escaped := false
+	var currentNode *node
+	// only start when we find "AAA"
+	for _, n := range nodes {
+		if n.name == "AAA" {
+			currentNode = n
+		}
+	}
 
-	currentNode := nodes[0]
 	stepCount := 0
 	instructionIterations := 0
 	for !escaped {
@@ -109,16 +115,14 @@ func findStepsRequired(instructions []rune, nodes []*node) (int, int) {
 
 			if instructions[idx] == 'L' {
 				if currentNode.leftNode.name == "ZZZ" {
-					stepCount++
 					escaped = true
-					break
+					//break
 				}
 				currentNode = currentNode.leftNode
 			} else if instructions[idx] == 'R' {
 				if currentNode.rightNode.name == "ZZZ" {
-					stepCount++
 					escaped = true
-					break
+					//break
 				}
 				currentNode = currentNode.rightNode
 			} else {
