@@ -132,7 +132,6 @@ func findStepsRequired(instructions []rune, nodes []*node) {
 					break
 				}
 				currentNode = currentNode.leftNode
-				idx++
 			} else if instructions[idx] == 'R' {
 				if currentNode.rightNode.name == "ZZZ" {
 					escaped = true
@@ -140,7 +139,11 @@ func findStepsRequired(instructions []rune, nodes []*node) {
 				}
 				currentNode = currentNode.rightNode
 			}
-			idx++
+			if idx == len(instructions)-1 {
+				idx = 0
+			} else {
+				idx++
+			}
 		}
 		instructionIterations++
 	}
