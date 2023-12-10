@@ -212,13 +212,13 @@ func neighbors(c cell) []cell {
 
 func directions(x, y int) []cell {
 	return []cell{
-		{x - 1, y - 1}, // upper left
-		{x - 1, y},     // left
-		{x - 1, y + 1}, // lower left
-		{x, y - 1},     // up
-		{x, y + 1},     // down
-		{x + 1, y - 1}, // upper right
-		{x + 1, y},     // right
-		{x + 1, y + 1}, // lower right
+		{x - 1, y - 1},
+		{x - 1, y},
+		{x - 1, y + 1},
+		{x, y - 1},
+		{x, y + 1},
+		{x + 1, y - 1},
+		{x + 1, y},
+		{x + 1, y + 1},
 	}
 }
