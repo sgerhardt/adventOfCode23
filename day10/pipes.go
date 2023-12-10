@@ -67,10 +67,15 @@ func traversePipe(input [][]rune, row, col int) int {
 			}
 			if directionVals[0] < 0 || directionVals[1] < 0 {
 				continue
+			} else if directionVals[0] >= len(input) || directionVals[1] >= len(input[directionVals[0]]) {
+				continue
 			}
 
 			checkingPosition := input[directionVals[0]][directionVals[1]]
 
+			//TODO need to check for allowed directions based on current position
+
+			//validOptions := validConnectingPipeOptions(checkingPosition, directionVals[0]-currentPosition[0], directionVals[1]-currentPosition[1])
 			if idx == 0 { // north
 				// check above for potential connection pipes (|, 7, F)
 				if checkingPosition == 'S' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) {
@@ -176,13 +181,66 @@ func traversePipe(input [][]rune, row, col int) int {
 					distanceTravelled++
 					break
 				}
-
+				prevPosition = currentPosition
 			}
 
 		}
 	}
 
 	return distanceTravelled
+}
+
+func validConnectingPipeOptions(currentPipeType rune, adjoiningPipePositionRow, adjoiningPipePositionCol int) []rune {
+	if currentPipeType == '|' {
+		if adjoiningPipePositionRow == -1 && adjoiningPipePositionCol == 0 {
+			return []rune{'|', 'F', '7'}
+		} else if adjoiningPipePositionRow == 1 && adjoiningPipePositionCol == 0 {
+			return []rune{'|', 'L', 'J'}
+		} else {
+			return []rune{}
+		}
+	} else if currentPipeType == '-' {
+		if adjoiningPipePositionRow == 0 && adjoiningPipePositionCol == -1 {
+			return []rune{'-', 'F', 'L'}
+		} else if adjoiningPipePositionRow == 1 && adjoiningPipePositionCol == 1 {
+			return []rune{'-', '7', 'J'}
+		} else {
+			return []rune{}
+		}
+	} else if currentPipeType == '7' {
+		if adjoiningPipePositionRow == 0 && adjoiningPipePositionCol == -1 {
+			return []rune{'-', 'F', 'L'}
+		} else if adjoiningPipePositionRow == 1 && adjoiningPipePositionCol == 0 {
+			return []rune{'L', '|', 'J'}
+		} else {
+			return []rune{}
+		}
+	} else if currentPipeType == 'F' {
+		if adjoiningPipePositionRow == 0 && adjoiningPipePositionCol == 1 {
+			return []rune{'-', 'J', '7'}
+		} else if adjoiningPipePositionRow == 1 && adjoiningPipePositionCol == 0 {
+			return []rune{'L', '|', 'J'}
+		} else {
+			return []rune{}
+		}
+	} else if currentPipeType == 'L' {
+		if adjoiningPipePositionRow == -1 && adjoiningPipePositionCol == 0 {
+			return []rune{'|', 'F', '7'}
+		} else if adjoiningPipePositionRow == 0 && adjoiningPipePositionCol == 1 {
+			return []rune{'-', '7', 'J'}
+		} else {
+			return []rune{}
+		}
+	} else if currentPipeType == 'J' {
+		if adjoiningPipePositionRow == 0 && adjoiningPipePositionCol == -1 {
+			return []rune{'-', 'F', 'L'}
+		} else if adjoiningPipePositionRow == -1 && adjoiningPipePositionCol == 0 {
+			return []rune{'|', 'F', '7'}
+		} else {
+			return []rune{}
+		}
+	}
+	return []rune{}
 }
 
 func isPrev(prev, current []int) bool {
