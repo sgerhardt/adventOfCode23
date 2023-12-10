@@ -11,7 +11,7 @@ func main() {
 	// Hardcoded filename
 	filename := "day8/nodes.txt"
 
-	//part1(filename)
+	part1(filename)
 	part2(filename)
 }
 
