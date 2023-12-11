@@ -52,7 +52,7 @@ func Test_pipeDistance(t *testing.T) {
 		{
 			name: "case with non main loop pipes",
 			args: args{
-				fileName: "/Users/seangerhardt/GolandProjects/adventOfCode23/day10/test2.txt",
+				fileName: "C:\\Projects\\Go\\src\\adventOfCode2023\\day10\\test2.txt",
 				input: func(fileName string) [][]rune {
 					file, err := os.Open(fileName)
 					if err != nil {
