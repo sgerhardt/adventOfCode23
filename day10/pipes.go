@@ -100,8 +100,6 @@ func traversePipe(input [][]rune, row, col int) int {
 
 			checkingPosition := input[directionVals[0]][directionVals[1]]
 
-			//TODO need to check for allowed directions based on current position
-
 			//validOptions := validConnectingPipeOptions(checkingPosition, directionVals[0]-currentPosition[0], directionVals[1]-currentPosition[1])
 			if idx == north {
 				// check above for potential connection pipes (|, 7, F)
@@ -294,13 +292,23 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == '|' && checkingPipeType == 'L' && direction == south {
 		return true
+	} else if currentPipeType == '|' && checkingPipeType == 'J' && direction == south {
+		return true
 	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == west {
 		return true
 	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == east {
 		return true
+	} else if currentPipeType == '-' && checkingPipeType == 'F' && direction == west {
+		return true
+	} else if currentPipeType == '-' && checkingPipeType == '7' && direction == east {
+		return true
 	} else if currentPipeType == '-' && checkingPipeType == 'J' && direction == east {
 		return true
 	} else if currentPipeType == '7' && checkingPipeType == '|' && direction == south {
+		return true
+	} else if currentPipeType == '7' && checkingPipeType == 'L' && direction == south {
+		return true
+	} else if currentPipeType == '7' && checkingPipeType == 'J' && direction == south {
 		return true
 	} else if currentPipeType == '7' && checkingPipeType == '-' && direction == west {
 		return true
@@ -308,13 +316,21 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == 'F' && checkingPipeType == '|' && direction == south {
 		return true
+	} else if currentPipeType == 'F' && checkingPipeType == 'L' && direction == south {
+		return true
+	} else if currentPipeType == 'F' && checkingPipeType == 'J' && direction == south {
+		return true
 	} else if currentPipeType == 'L' && checkingPipeType == '|' && direction == north {
 		return true
 	} else if currentPipeType == 'L' && checkingPipeType == '-' && direction == east {
 		return true
 	} else if currentPipeType == 'J' && checkingPipeType == '|' && direction == north {
 		return true
-	} else if currentPipeType == 'J' && checkingPipeType == '-' && direction == east {
+	} else if currentPipeType == 'J' && checkingPipeType == 'F' && direction == west {
+		return true
+	} else if currentPipeType == 'J' && checkingPipeType == '-' && direction == west {
+		return true
+	} else if currentPipeType == 'J' && checkingPipeType == 'L' && direction == west {
 		return true
 	}
 
