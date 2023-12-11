@@ -55,6 +55,13 @@ const (
 	east
 )
 
+var deadEnds map[string]bool
+var restart bool
+
+func init() {
+	deadEnds = make(map[string]bool)
+}
+
 func traversePipe(input [][]rune, row, col int) int {
 
 	// search around the starting point for a connecting pipe
@@ -67,6 +74,19 @@ func traversePipe(input [][]rune, row, col int) int {
 
 	foundStart := distanceTravelled > 0 && startPosition[0] == currentPosition[0] && startPosition[1] == currentPosition[1]
 	for !foundStart {
+
+		if restart {
+			fmt.Println("dead end found... restarting")
+			// this means we've hit a dead end and need to restart from the beginning
+			restart = false
+			prevPosition = []int{-1, -1}
+			currentPosition = []int{row, col}
+		}
+
+		if prevPosition[0] == currentPosition[0] && prevPosition[1] == currentPosition[1] {
+			deadEnds[fmt.Sprintf("%d,%d", currentPosition[0], currentPosition[1])] = true
+		}
+
 		for idx, directionVals := range directions(currentPosition[0], currentPosition[1]) {
 			if foundStart {
 				// we've reached the end of the pipe
@@ -168,7 +188,7 @@ func traversePipe(input [][]rune, row, col int) int {
 				if checkingPosition == '-' &&
 					!isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
 					isValidDirection(input, checkingPosition, idx, currentPosition) {
-					fmt.Println("Movingwest  to - at ", directionVals[0], directionVals[1])
+					fmt.Println("Moving west to - at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
@@ -232,12 +252,33 @@ func traversePipe(input [][]rune, row, col int) int {
 	return distanceTravelled
 }
 
-//func isValidDirection(input [][]rune, checkingPosition rune, idx int, currentPosition []int) bool {
-//	return validConnectingPipeOptions(checkingPosition, idx, currentPosition, input)
-//}
-
 func isValidDirection(input [][]rune, checkingPipeType rune, direction int, currentPosition []int) bool {
 	currentPipeType := input[currentPosition[0]][currentPosition[1]]
+
+	nextRow := currentPosition[0]
+	nextCol := currentPosition[1]
+	if direction == north {
+		nextRow++
+	} else if direction == south {
+		nextRow--
+	} else if direction == west {
+		nextCol--
+	} else if direction == east {
+		nextCol++
+	}
+	_, isDeadEnd := deadEnds[fmt.Sprintf("%d,%d", nextRow, nextCol)]
+	if isDeadEnd {
+		return false
+	}
+	_, inDeadEnd := deadEnds[fmt.Sprintf("%d,%d", currentPosition[0], currentPosition[1])]
+	if inDeadEnd {
+		restart = true
+		return false
+	}
+
+	if checkingPipeType == 'S' {
+		return true
+	}
 
 	if currentPipeType == 'S' && checkingPipeType != '.' {
 		return true
@@ -249,11 +290,15 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == '|' && checkingPipeType == '|' && direction == south {
 		return true
+	} else if currentPipeType == '|' && checkingPipeType == '7' && direction == north {
+		return true
 	} else if currentPipeType == '|' && checkingPipeType == 'L' && direction == south {
 		return true
 	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == west {
 		return true
 	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == east {
+		return true
+	} else if currentPipeType == '-' && checkingPipeType == 'J' && direction == east {
 		return true
 	} else if currentPipeType == '7' && checkingPipeType == '|' && direction == south {
 		return true
@@ -265,7 +310,7 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == 'L' && checkingPipeType == '|' && direction == north {
 		return true
-	} else if currentPipeType == 'L' && checkingPipeType == '-' && direction == west {
+	} else if currentPipeType == 'L' && checkingPipeType == '-' && direction == east {
 		return true
 	} else if currentPipeType == 'J' && checkingPipeType == '|' && direction == north {
 		return true
