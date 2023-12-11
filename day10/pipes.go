@@ -76,6 +76,7 @@ func traversePipe(input [][]rune, row, col int) int {
 	for !foundStart {
 
 		if restart {
+			panic("dead end found...")
 			fmt.Println("dead end found... restarting")
 			// this means we've hit a dead end and need to restart from the beginning
 			restart = false
@@ -310,7 +311,11 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == '7' && checkingPipeType == 'J' && direction == south {
 		return true
+	} else if currentPipeType == '7' && checkingPipeType == 'L' && direction == west {
+		return true
 	} else if currentPipeType == '7' && checkingPipeType == '-' && direction == west {
+		return true
+	} else if currentPipeType == '7' && checkingPipeType == 'F' && direction == west {
 		return true
 	} else if currentPipeType == 'F' && checkingPipeType == '-' && direction == east {
 		return true
@@ -318,13 +323,21 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == 'F' && checkingPipeType == 'L' && direction == south {
 		return true
+	} else if currentPipeType == 'F' && checkingPipeType == 'J' && direction == east {
+		return true
 	} else if currentPipeType == 'F' && checkingPipeType == 'J' && direction == south {
 		return true
 	} else if currentPipeType == 'L' && checkingPipeType == '|' && direction == north {
 		return true
 	} else if currentPipeType == 'L' && checkingPipeType == '-' && direction == east {
 		return true
+	} else if currentPipeType == 'L' && checkingPipeType == 'J' && direction == east {
+		return true
 	} else if currentPipeType == 'J' && checkingPipeType == '|' && direction == north {
+		return true
+	} else if currentPipeType == 'J' && checkingPipeType == '7' && direction == north {
+		return true
+	} else if currentPipeType == 'J' && checkingPipeType == 'F' && direction == north {
 		return true
 	} else if currentPipeType == 'J' && checkingPipeType == 'F' && direction == west {
 		return true
@@ -333,6 +346,8 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 	} else if currentPipeType == 'J' && checkingPipeType == 'L' && direction == west {
 		return true
 	}
+
+	//todo can L (north and east) connect to 7 (south and west)?
 
 	return false
 }

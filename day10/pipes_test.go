@@ -77,34 +77,34 @@ func Test_pipeDistance(t *testing.T) {
 			},
 			want: 4,
 		},
-		//{
-		//	name: "more complex case with non main loop pipes",
-		//	args: args{
-		//		fileName: "/Users/seangerhardt/GolandProjects/adventOfCode23/day10/test.txt",
-		//		input: func(fileName string) [][]rune {
-		//			file, err := os.Open(fileName)
-		//			if err != nil {
-		//				fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-		//				os.Exit(1)
-		//			}
-		//			defer file.Close()
-		//			scanner := bufio.NewScanner(file)
-		//
-		//			var input [][]rune
-		//			idx := 0
-		//			for scanner.Scan() {
-		//				input = append(input, []rune{})
-		//				line := scanner.Text()
-		//				for _, char := range line {
-		//					input[idx] = append(input[idx], char)
-		//				}
-		//				idx++
-		//			}
-		//			return input
-		//		},
-		//	},
-		//	want: 4,
-		//},
+		{
+			name: "more complex case with non main loop pipes",
+			args: args{
+				fileName: "test3.txt",
+				input: func(fileName string) [][]rune {
+					file, err := os.Open(fileName)
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+						os.Exit(1)
+					}
+					defer file.Close()
+					scanner := bufio.NewScanner(file)
+
+					var input [][]rune
+					idx := 0
+					for scanner.Scan() {
+						input = append(input, []rune{})
+						line := scanner.Text()
+						for _, char := range line {
+							input[idx] = append(input[idx], char)
+						}
+						idx++
+					}
+					return input
+				},
+			},
+			want: 8,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
