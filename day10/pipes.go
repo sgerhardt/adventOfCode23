@@ -76,19 +76,21 @@ func traversePipe(input [][]rune, row, col int) int {
 	for !foundStart {
 
 		if restart {
-			panic("dead end found...")
+			//panic("dead end found...")
+			// TODO restart at the beginning, and omit our previous start direction...
 			fmt.Println("dead end found... restarting")
 			// this means we've hit a dead end and need to restart from the beginning
 			restart = false
 			prevPosition = []int{-1, -1}
 			currentPosition = []int{row, col}
+			distanceTravelled = 0
 		}
 
 		if prevPosition[0] == currentPosition[0] && prevPosition[1] == currentPosition[1] {
 			deadEnds[fmt.Sprintf("%d,%d", currentPosition[0], currentPosition[1])] = true
 		}
 
-		for idx, directionVals := range directions(currentPosition[0], currentPosition[1]) {
+		for dir, directionVals := range directions(currentPosition[0], currentPosition[1]) {
 			if foundStart {
 				// we've reached the end of the pipe
 				return distanceTravelled
@@ -102,10 +104,10 @@ func traversePipe(input [][]rune, row, col int) int {
 			checkingPosition := input[directionVals[0]][directionVals[1]]
 
 			//validOptions := validConnectingPipeOptions(checkingPosition, directionVals[0]-currentPosition[0], directionVals[1]-currentPosition[1])
-			if idx == north {
+			if dir == north {
 				// check above for potential connection pipes (|, 7, F)
 				if checkingPosition == 'S' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving north to S at ", directionVals[0], directionVals[1])
 					// we've looped back
 					prevPosition = currentPosition
@@ -115,31 +117,32 @@ func traversePipe(input [][]rune, row, col int) int {
 					break
 				}
 				if checkingPosition == '|' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving north to | at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
+
 					break
 				} else if checkingPosition == '7' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving north to 7 at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				} else if checkingPosition == 'F' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving north to F at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				}
-			} else if idx == south {
+			} else if dir == south {
 				// check below for potential connection pipes (|, L, J)
 				if checkingPosition == 'S' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving south to S at ", directionVals[0], directionVals[1])
 					// we've looped back
 					prevPosition = currentPosition
@@ -150,7 +153,7 @@ func traversePipe(input [][]rune, row, col int) int {
 				}
 				if checkingPosition == '|' &&
 					!isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving south to | at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
@@ -158,26 +161,26 @@ func traversePipe(input [][]rune, row, col int) int {
 					break
 				} else if checkingPosition == 'L' &&
 					!isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving south to L at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				} else if checkingPosition == 'J' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving south to J at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				}
-			} else if idx == west {
+			} else if dir == west {
 				// check west for potential connection pipes (-, F, L)
 				if checkingPosition == 'S' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving west to S at ", directionVals[0], directionVals[1])
-					// we've looped back
+
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
@@ -186,31 +189,31 @@ func traversePipe(input [][]rune, row, col int) int {
 				}
 				if checkingPosition == '-' &&
 					!isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving west to - at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				} else if checkingPosition == 'F' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving west to F at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				} else if checkingPosition == 'L' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving west to L at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				}
-			} else if idx == east {
+			} else if dir == east {
 				// check east for potential connection pipes (-, 7, J)
 				if checkingPosition == 'S' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving east to S at ", directionVals[0], directionVals[1])
 					// we've looped back
 					prevPosition = currentPosition
@@ -221,21 +224,21 @@ func traversePipe(input [][]rune, row, col int) int {
 				}
 
 				if checkingPosition == '-' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving east to - at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				} else if checkingPosition == '7' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving east to 7 at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
 					distanceTravelled++
 					break
 				} else if checkingPosition == 'J' && !isPrev(prevPosition, []int{directionVals[0], directionVals[1]}) &&
-					isValidDirection(input, checkingPosition, idx, currentPosition) {
+					isValidDirection(input, checkingPosition, dir, currentPosition) {
 					fmt.Println("Moving east to J at ", directionVals[0], directionVals[1])
 					prevPosition = currentPosition
 					currentPosition = directionVals
@@ -271,7 +274,6 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 	}
 	_, inDeadEnd := deadEnds[fmt.Sprintf("%d,%d", currentPosition[0], currentPosition[1])]
 	if inDeadEnd {
-		restart = true
 		return false
 	}
 
@@ -283,29 +285,38 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	}
 
-	// TODO add "dead end" pipes to check for
-
+	// | is a vertical pipe connecting north and south.
 	if currentPipeType == '|' && checkingPipeType == '|' && direction == north {
 		return true
-	} else if currentPipeType == '|' && checkingPipeType == '|' && direction == south {
-		return true
 	} else if currentPipeType == '|' && checkingPipeType == '7' && direction == north {
+		return true
+	} else if currentPipeType == '|' && checkingPipeType == 'F' && direction == north {
+		return true
+	} else if currentPipeType == '|' && checkingPipeType == '|' && direction == south {
 		return true
 	} else if currentPipeType == '|' && checkingPipeType == 'L' && direction == south {
 		return true
 	} else if currentPipeType == '|' && checkingPipeType == 'J' && direction == south {
 		return true
-	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == west {
-		return true
-	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == east {
+	}
+
+	// - is a horizontal pipe connecting east and west.
+	if currentPipeType == '-' && checkingPipeType == '-' && direction == west {
 		return true
 	} else if currentPipeType == '-' && checkingPipeType == 'F' && direction == west {
+		return true
+	} else if currentPipeType == '-' && checkingPipeType == 'L' && direction == west {
+		return true
+	} else if currentPipeType == '-' && checkingPipeType == '-' && direction == east {
 		return true
 	} else if currentPipeType == '-' && checkingPipeType == '7' && direction == east {
 		return true
 	} else if currentPipeType == '-' && checkingPipeType == 'J' && direction == east {
 		return true
-	} else if currentPipeType == '7' && checkingPipeType == '|' && direction == south {
+	}
+
+	// 7 is a 90-degree bend connecting south and west.
+	if currentPipeType == '7' && checkingPipeType == '|' && direction == south {
 		return true
 	} else if currentPipeType == '7' && checkingPipeType == 'L' && direction == south {
 		return true
@@ -317,23 +328,40 @@ func isValidDirection(input [][]rune, checkingPipeType rune, direction int, curr
 		return true
 	} else if currentPipeType == '7' && checkingPipeType == 'F' && direction == west {
 		return true
-	} else if currentPipeType == 'F' && checkingPipeType == '-' && direction == east {
+	}
+
+	// F is a 90-degree bend connecting south and east
+	if currentPipeType == 'F' && checkingPipeType == '-' && direction == east {
+		return true
+	} else if currentPipeType == 'F' && checkingPipeType == 'J' && direction == east {
+		return true
+	} else if currentPipeType == 'F' && checkingPipeType == '7' && direction == east {
 		return true
 	} else if currentPipeType == 'F' && checkingPipeType == '|' && direction == south {
 		return true
 	} else if currentPipeType == 'F' && checkingPipeType == 'L' && direction == south {
 		return true
-	} else if currentPipeType == 'F' && checkingPipeType == 'J' && direction == east {
-		return true
 	} else if currentPipeType == 'F' && checkingPipeType == 'J' && direction == south {
 		return true
-	} else if currentPipeType == 'L' && checkingPipeType == '|' && direction == north {
+	}
+
+	// L is a 90-degree bend connecting north and east
+	if currentPipeType == 'L' && checkingPipeType == '|' && direction == north {
+		return true
+	} else if currentPipeType == 'L' && checkingPipeType == '7' && direction == north {
+		return true
+	} else if currentPipeType == 'L' && checkingPipeType == 'F' && direction == north {
 		return true
 	} else if currentPipeType == 'L' && checkingPipeType == '-' && direction == east {
 		return true
 	} else if currentPipeType == 'L' && checkingPipeType == 'J' && direction == east {
 		return true
-	} else if currentPipeType == 'J' && checkingPipeType == '|' && direction == north {
+	} else if currentPipeType == 'L' && checkingPipeType == '7' && direction == east {
+		return true
+	}
+
+	// J is a 90-degree bend connecting north and west.
+	if currentPipeType == 'J' && checkingPipeType == '|' && direction == north {
 		return true
 	} else if currentPipeType == 'J' && checkingPipeType == '7' && direction == north {
 		return true
