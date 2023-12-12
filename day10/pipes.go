@@ -63,29 +63,13 @@ func init() {
 }
 
 func traversePipe(input [][]rune, row, col int) int {
-
-	// search around the starting point for a connecting pipe
-	startPosition := []int{row, col}
-
 	prevPosition := []int{-1, -1}
 	currentPosition := []int{row, col}
 
 	distanceTravelled := 0
 
-	foundStart := distanceTravelled > 0 && startPosition[0] == currentPosition[0] && startPosition[1] == currentPosition[1]
+	foundStart := false
 	for !foundStart {
-
-		if restart {
-			//panic("dead end found...")
-			// TODO restart at the beginning, and omit our previous start direction...
-			fmt.Println("dead end found... restarting")
-			// this means we've hit a dead end and need to restart from the beginning
-			restart = false
-			prevPosition = []int{-1, -1}
-			currentPosition = []int{row, col}
-			distanceTravelled = 0
-		}
-
 		if prevPosition[0] == currentPosition[0] && prevPosition[1] == currentPosition[1] {
 			deadEnds[fmt.Sprintf("%d,%d", currentPosition[0], currentPosition[1])] = true
 		}
