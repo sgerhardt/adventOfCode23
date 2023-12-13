@@ -68,29 +68,20 @@ func part1(filename string) {
 
 	galaxies := gatherGalaxies(input)
 	sum := 0
-	for _, g := range galaxies {
-		for _, otherGalaxy := range galaxies {
+	for i := 0; i < len(galaxies); i++ {
+		for j := i + 1; j < len(galaxies); j++ {
+			g := galaxies[i]
+			otherGalaxy := galaxies[j]
 			if g == otherGalaxy {
 				continue
 			}
-			if _, ok := galaxyPairs[otherGalaxy]; ok {
-				// we already calculated this distance
-				continue
-			}
 			distance := calcDistance(g.pos, otherGalaxy.pos)
-			galaxyPairs[g] = otherGalaxy
 			sum += distance
 			fmt.Printf("Between galaxy %d and galaxy %d from galaxy: %d \n", g.number, otherGalaxy.number, distance)
 			//fmt.Println(distance)
 		}
 	}
 	fmt.Println("Sum of distances:", sum)
-}
-
-var galaxyPairs map[galaxy]galaxy
-
-func init() {
-	galaxyPairs = make(map[galaxy]galaxy)
 }
 
 func addEmptyRow(input [][]string, idx int) [][]string {
@@ -144,6 +135,14 @@ func calcDistance(position1, position2 position) int {
 	rise := int(math.Abs(float64(position1.row - position2.row)))
 	run := int(math.Abs(float64(position1.col - position2.col)))
 
-	// TODO can't use pythagorean theorem, we are supposed to count discreet steps instead
-	return int(math.Sqrt(float64(run*run + rise*rise)))
+	sum := 0
+
+	if run == 0 {
+		return rise
+	} else if rise == 0 {
+		return run
+	}
+	// for each rise, we add two to the run until we reach the rise, then we add one to the run until we hit the target
+	return 2*rise + (run - rise)
+	return sum
 }
