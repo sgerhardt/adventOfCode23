@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	part1("day11/test.txt")
+	part1("day11/stars.txt")
 }
 
 func part1(filename string) {
@@ -28,7 +28,6 @@ func part1(filename string) {
 	var emptyColIndexes []int
 	for scanner.Scan() {
 		line := scanner.Text()
-		//print(line)
 		if !strings.Contains(line, "#") {
 			// we found an empty row
 			emptyRowIndexes = append(emptyRowIndexes, idx)
@@ -69,16 +68,13 @@ func part1(filename string) {
 	galaxies := gatherGalaxies(input)
 	sum := 0
 	for i := 0; i < len(galaxies); i++ {
+		// start at i+1 to avoid double counting
 		for j := i + 1; j < len(galaxies); j++ {
 			g := galaxies[i]
 			otherGalaxy := galaxies[j]
-			if g == otherGalaxy {
-				continue
-			}
 			distance := calcDistance(g.pos, otherGalaxy.pos)
 			sum += distance
 			fmt.Printf("Between galaxy %d and galaxy %d from galaxy: %d \n", g.number, otherGalaxy.number, distance)
-			//fmt.Println(distance)
 		}
 	}
 	fmt.Println("Sum of distances:", sum)
@@ -112,19 +108,19 @@ type galaxy struct {
 func gatherGalaxies(input [][]string) []galaxy {
 	// find all the galaxies
 	var galaxies []galaxy
-	galaxNum := 1
+	galaxyNum := 1
 	for row := 0; row < len(input); row++ {
 		for col := 0; col < len(input[0]); col++ {
 			if input[row][col] == "#" {
 				// we found a galaxy
 				galaxies = append(galaxies, galaxy{
-					number: galaxNum,
+					number: galaxyNum,
 					pos: position{
 						row: row,
 						col: col,
 					},
 				})
-				galaxNum++
+				galaxyNum++
 			}
 		}
 	}
