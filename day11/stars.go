@@ -131,8 +131,6 @@ func calcDistance(position1, position2 position) int {
 	rise := int(math.Abs(float64(position1.row - position2.row)))
 	run := int(math.Abs(float64(position1.col - position2.col)))
 
-	sum := 0
-
 	if run == 0 {
 		return rise
 	} else if rise == 0 {
@@ -140,5 +138,4 @@ func calcDistance(position1, position2 position) int {
 	}
 	// for each rise, we add two to the run until we reach the rise, then we add one to the run until we hit the target
 	return 2*rise + (run - rise)
-	return sum
 }
