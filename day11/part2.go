@@ -51,18 +51,12 @@ func findAllGalaxies(universe []string) Galaxies {
 	return galaxies
 }
 
-func reduce[T comparable](f func(a T, v T) T, input []T, initial T) T {
-	trailing := initial
-	for i := range input {
-		trailing = f(trailing, input[i])
-	}
-	return trailing
-}
-
 func sumReduce(input []int) int {
-	return reduce(func(a, v int) int {
-		return a + v
-	}, input, 0)
+	sum := 0
+	for _, val := range input {
+		sum += val
+	}
+	return sum
 }
 
 var M = 999_999
