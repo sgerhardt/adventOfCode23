@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	filename := "day11/test.txt"
+	filename := "day11/stars.txt"
 	//part1(filename)
 	part2(filename)
 }
@@ -138,11 +138,11 @@ func calcDistance(position1, position2 position) int {
 	} else if rise == 0 {
 		return run
 	}
-	// for each rise, we add two to the run until we reach the rise, then we add one to the run until we hit the target
+	// for each rise, we add two to the part2 until we reach the rise, then we add one to the part2 until we hit the target
 	return 2*rise + (run - rise)
 }
 
-func part2(filename string) {
+func part2Old(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
